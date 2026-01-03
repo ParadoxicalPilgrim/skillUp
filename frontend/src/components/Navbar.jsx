@@ -44,8 +44,8 @@ const Navbar = () => {
             to="/"
             className={({ isActive }) =>
               isActive
-                ? "text-gray-900 border-b-2 border-purple-600 "
-                : "text-gray-100 hover:text-gray-900 transition-colors"
+                ? "text-white border-b-2 border-white font-semibold"
+                : "text-purple-100 hover:text-white transition-colors"
             }
           >
             Home
@@ -54,8 +54,8 @@ const Navbar = () => {
             to="/about"
             className={({ isActive }) =>
               isActive
-                ? "text-gray-900 border-b-2 border-purple-600 "
-                : "text-gray-100 hover:text-gray-900 transition-colors"
+                ? "text-white border-b-2 border-white font-semibold"
+                : "text-purple-100 hover:text-white transition-colors"
             }
           >
             About
@@ -64,8 +64,8 @@ const Navbar = () => {
             to="/features"
             className={({ isActive }) =>
               isActive
-                ? "text-gray-900 border-b-2 border-purple-600 "
-                : "text-gray-100 hover:text-gray-900 transition-colors"
+                ? "text-white border-b-2 border-white font-semibold"
+                : "text-purple-100 hover:text-white transition-colors"
             }
           >
             Features
@@ -75,8 +75,8 @@ const Navbar = () => {
             to="/contact"
             className={({ isActive }) =>
               isActive
-                ? "text-gray-900 border-b-2 border-purple-600 "
-                : "text-gray-100 hover:text-gray-900 transition-colors"
+                ? "text-white border-b-2 border-white font-semibold"
+                : "text-purple-100 hover:text-white transition-colors"
             }
           >
             Contact
@@ -113,8 +113,8 @@ const Navbar = () => {
                 to="/features"
                 className={({ isActive }) =>
                   isActive
-                    ? "text-gray-900 bg-purple-50 px-4 py-3 font-medium"
-                    : "text-gray-600 hover:bg-gray-50 px-4 py-3 transition-colors"
+                    ? "text-white bg-white-50 px-4 py-3 font-medium"
+                    : "text-white hover:bg-gray-50 px-4 py-3 transition-colors"
                 }
                 onClick={() => setIsMenuOpen(false)}
               >
