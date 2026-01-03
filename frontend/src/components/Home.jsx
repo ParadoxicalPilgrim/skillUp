@@ -348,11 +348,22 @@ const Home = () => {
     }
   };
 
+  const [limitWarning, setLimitWarning] = useState(false);
+
   const handleJobTitleChange = (e) => {
-    const value = e.target.value;
+    let value = e.target.value;
+
+    if (value.length > 100) {
+      value = value.substring(0, 100);
+      setLimitWarning(true);
+    } else {
+      setLimitWarning(false);
+    }
+
     setJobTitle(value);
 
-    if (validationError) {
+    // Only clear validation error if it's not the limit warning (which is handled separately)
+    if (validationError && validationError !== "Character limit crossed!") {
       setValidationError("");
     }
   };
@@ -471,7 +482,7 @@ const Home = () => {
             </div>
 
             {/* Enhanced Form Card */}
-            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl">
+            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-xl mt-6">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
                   <Target className="h-6 w-6 text-purple-600" />
@@ -537,11 +548,10 @@ const Home = () => {
 
                   {documentValidationResult && (
                     <div
-                      className={`flex items-center gap-2 text-sm mt-2 p-3 rounded-lg ${
-                        documentValidationResult.isValid
-                          ? "text-green-600 bg-green-50"
-                          : "text-red-600 bg-red-50"
-                      }`}
+                      className={`flex items-center gap-2 text-sm mt-2 p-3 rounded-lg ${documentValidationResult.isValid
+                        ? "text-green-600 bg-green-50"
+                        : "text-red-600 bg-red-50"
+                        }`}
                     >
                       {documentValidationResult.isValid ? (
                         <CheckCircle className="h-4 w-4" />
@@ -571,11 +581,10 @@ const Home = () => {
                     required
                     value={jobTitle}
                     onChange={handleJobTitleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
-                      validationError
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${validationError
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-300"
+                      }`}
                   />
                   {validationError && (
                     <div className="flex items-center gap-2 text-red-600 text-sm mt-2">
@@ -583,9 +592,15 @@ const Home = () => {
                       <span>{validationError}</span>
                     </div>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter a specific job role you're targeting
-                  </p>
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-xs text-gray-500">
+                      Enter a specific job role you're targeting
+                    </p>
+                    <p className={`text-xs ${limitWarning ? "text-red-500 font-medium" : "text-gray-400"
+                      }`}>
+                      {limitWarning ? "Character limit crossed!" : `${jobTitle.length}/100`}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Submit Button */}
@@ -615,7 +630,7 @@ const Home = () => {
                 </button>
               </form>
 
-             
+
             </div>
           </div>
         </div>
@@ -727,7 +742,7 @@ const Home = () => {
             <Analytics />
           </div>
         </footer>
-       
+
       </div>
     </div>
   );

@@ -12,12 +12,30 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const [limitWarnings, setLimitWarnings] = useState({
+    name: false,
+    email: false,
+    message: false,
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    let limit = 100; // Default limit for name and email
+    if (name === "message") limit = 500;
+
+    if (value.length > limit) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value.substring(0, limit),
+      }));
+      setLimitWarnings((prev) => ({ ...prev, [name]: true }));
+    } else {
+      setLimitWarnings((prev) => ({ ...prev, [name]: false }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -29,6 +47,7 @@ const Contact = () => {
       setIsSubmitting(false);
       setSubmitSuccess(true);
       setFormData({ name: "", email: "", message: "" });
+      setLimitWarnings({ name: false, email: false, message: false }); // Reset warnings
 
       // Reset success message after 3 seconds
       setTimeout(() => {
@@ -44,7 +63,7 @@ const Contact = () => {
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 pt-18">
                 Contact Us
               </h1>
               <p className="text-gray-600">
@@ -71,6 +90,10 @@ const Contact = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Your name"
                   />
+                  <p className={`text-xs mt-1 text-right ${limitWarnings.name ? "text-red-500 font-medium" : "text-gray-400"
+                    }`}>
+                    {limitWarnings.name ? "Character limit crossed!" : `${formData.name.length}/100`}
+                  </p>
                 </div>
 
                 <div>
@@ -90,6 +113,10 @@ const Contact = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="your.email@example.com"
                   />
+                  <p className={`text-xs mt-1 text-right ${limitWarnings.email ? "text-red-500 font-medium" : "text-gray-400"
+                    }`}>
+                    {limitWarnings.email ? "Character limit crossed!" : `${formData.email.length}/100`}
+                  </p>
                 </div>
 
                 <div>
@@ -109,6 +136,11 @@ const Contact = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="How can we help you?"
                   ></textarea>
+                  {/* Character limit warning */}
+                  <p className={`text-xs mt-1 text-right ${limitWarnings.message ? "text-red-500 font-medium" : "text-gray-400"
+                    }`}>
+                    {limitWarnings.message ? "Character limit crossed!" : `${formData.message.length}/500`}
+                  </p>
                 </div>
 
                 <button
