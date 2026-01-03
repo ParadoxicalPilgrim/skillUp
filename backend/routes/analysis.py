@@ -100,8 +100,38 @@ async def analyze_resume(file: UploadFile = File(...), job_title: str = Form(...
                 skill_gap = "- No specific missing skills identified\n- Consider reviewing job requirements for additional skills"
 
         else:
+            error_text = response.text.lower()
             logger.error(f"Gemini API error: {response.text}")
-            skill_gap = "- Unable to analyze resume at this time\n- Please try again later"
+            
+            if "quota" in error_text or "429" in error_text or "resourceexhausted" in error_text:
+                return {
+                    "success": False,
+                    "user_message": "Daily analysis limit reached. Free Gemini API has limited requests. Try tomorrow or new API key.",
+                    "missing_skills": "- Daily quota exceeded",
+                    "extracted_text": extracted_text,
+                    "job_title": job_title,
+                    "error_code": "QUOTA_EXCEEDED"
+                }
+            elif "timeout" in error_text or "deadline" in error_text or "unavailable" in error_text:
+                return {
+                    "success": False,
+                    "user_message": "AI service busy. Try again in 2-3 minutes.",
+                    "missing_skills": "- Service temporarily unavailable",
+                    "extracted_text": extracted_text,
+                    "job_title": job_title,
+                    "error_code": "SERVICE_BUSY"
+                }
+            else:
+                return {
+                    "success": False,
+                    "user_message": "Analysis service temporarily unavailable. Try again later.",
+                    "missing_skills": "- Unable to analyze resume at this time",
+                    "extracted_text": extracted_text,
+                    "job_title": job_title,
+                    "error_code": "SERVICE_ERROR"
+                }
+
+
 
         # IMPORTANT: Return both missing skills AND extracted text
         return {
@@ -346,8 +376,31 @@ async def job_matching(request: dict):
                 job_recommendations = "Unable to generate job recommendations at this time. Please try again."
 
         else:
+            error_text = response.text.lower()
             logger.error(f"Gemini API error: Status {response.status_code}, Response: {response.text}")
-            job_recommendations = "Unable to generate job recommendations due to API error. Please try again."
+            
+            if "quota" in error_text or "429" in error_text or "resourceexhausted" in error_text:
+                return {
+                    "job_recommendations": "Daily quota exceeded. Cannot generate job recommendations right now.",
+                    "skills_analyzed": skills,
+                    "job_title": job_title,
+                    "error_code": "QUOTA_EXCEEDED",
+                    "user_message": "Daily analysis limit reached. Free Gemini API has limited requests."
+                }
+            elif "timeout" in error_text or "deadline" in error_text:
+                return {
+                    "job_recommendations": "AI service busy. Try again in few minutes.",
+                    "skills_analyzed": skills,
+                    "job_title": job_title,
+                    "error_code": "SERVICE_BUSY"
+                }
+            else:
+                return {
+                    "job_recommendations": "Unable to generate job recommendations due to API error. Please try again.",
+                    "skills_analyzed": skills,
+                    "job_title": job_title,
+                    "error_code": "SERVICE_ERROR"
+                }
 
         return {
             "job_recommendations": job_recommendations,
@@ -396,8 +449,22 @@ async def project_generator(request: SkillsRequest):
                 project_ideas = "Unable to generate project ideas at this time. Please try again."
 
         else:
+            error_text = response.text.lower()
             logger.error(f"Gemini API error: {response.text}")
-            project_ideas = "Unable to generate project ideas due to API error. Please try again."
+            
+            if "quota" in error_text or "429" in error_text:
+                return {
+                    "project_ideas": "Daily quota exceeded. Cannot generate projects right now.",
+                    "skills_analyzed": skills,
+                    "error_code": "QUOTA_EXCEEDED",
+                    "user_message": "Daily generation limit reached."
+                }
+            else:
+                return {
+                    "project_ideas": "Unable to generate project ideas due to service error. Try again later.",
+                    "skills_analyzed": skills,
+                    "error_code": "SERVICE_ERROR"
+                }
 
         return {
             "project_ideas": project_ideas,
